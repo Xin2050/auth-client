@@ -1,17 +1,45 @@
-import React from 'react';
+import React from "react";
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import App from './components/App';
+import {Router,Switch} from 'react-router-dom';
+import history from "./base/history";
+import {BrowserRouter, Route} from "react-router-dom";
+import Welcome from "./components/Welcome";
+import Signup from "./components/auth/Signup";
+import {Provider} from 'react-redux';
+import {applyMiddleware, compose, createStore} from "redux";
+import reducers from './reducer'
+import thunk from 'redux-thunk';
+import Feature from "./components/Feature";
+import Signout from "./components/auth/Signout";
+import Signin from "./components/auth/Signin";
+
+
+const compostEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const store = createStore(
+    reducers,{
+        auth:{authenticated: localStorage.getItem("auth_token")}
+    },
+    compostEnhancers(applyMiddleware(thunk))
+)
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    <Provider store={store}>
+    <BrowserRouter>
+        <App>
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+            <Route path="/" exact component={Welcome}/>
+            <Route path="/signup" component={Signup} />
+            <Route path="/feature" component={Feature}/>
+            <Route path="/signout" component={Signout}/>
+            <Route path="/signin" component={Signin}/>
+        </App>
+    </BrowserRouter>
+    </Provider>
+
+
+    ,document.getElementById("root")
+)
+
+
